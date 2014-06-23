@@ -5,6 +5,7 @@
 //
 // Modified to work with Outlook 2010 by CL <cleitet@gmail.com> 2012-10-15
 //
+// Modified to check that Microsoft Outlook is installed <christoffer@jnk.dk> 2014-06-23
 
 #include "stdafx.h"
 #include <mapix.h>
@@ -80,6 +81,18 @@ int main(int argc, char *argv[]) {
       cout << " All Users              (All Exchange users)" << endl;
       return 1;
    }
+
+   // Start modified by CN
+
+   HKEY subKey = nullptr;
+   LONG result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT("SOFTWARE\\Clients\\Mail\\Microsoft Outlook"), 0, KEY_READ, &subKey);
+   if (result != ERROR_SUCCESS)
+   {
+	   cout << "Error: Could not find Microsoft Outlook on machine" << endl;
+	   return 0;
+   }
+
+   // End modified by CN
 
    // Initialize MAPI
    hr = MAPIInitialize(NULL);
