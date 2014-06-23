@@ -5,13 +5,34 @@
 //
 // Shawn Poulson <spoulson@explodingcoder.com>, 2008.10.24
 //
+// Modified to work with Outlook 2010 by CL <cleitet@gmail.com> 2012-08-21
+//
 
 #include "stdafx.h"
 #include <mapix.h>
 #include <mapiutil.h>
+// Start modified by CL
+
+#include <INITGUID.H>
+
+// End modified by CL
+
 #include <string>
 #include <iostream>
 using namespace std;
+
+//Start modified by CL
+
+// See http://msdn.microsoft.com/en-us/library/office/hh204510
+// PidTagAddressBookChooseDirectoryAutomatically Canonical Property
+#define PR_AB_CHOOSE_DIRECTORY_AUTOMATICALLY PROP_TAG( PT_BOOLEAN, 0x3D1C)
+
+// http://blogs.msdn.com/b/stephen_griffin/archive/2010/09/13/you-chose-wisely.aspx
+// Capone profile section
+// {00020D0A-0000-0000-C000-000000000046}
+DEFINE_OLEGUID(IID_CAPONE_PROF, 0x00020d0a, 0, 0);
+
+//End modified by CL
 
 STDMETHODIMP MAPILogon(LPMAPISESSION *lpMAPISession);
 void MAPILogoff(IMAPISession &Session);
@@ -25,6 +46,12 @@ int main(int argc, char *argv[]) {
    if (argc != 2) {
       cout << "Set MAPI default address list" << endl;
       cout << "Shawn Poulson <spoulson@explodingcoder.com>, 2008.10.24" << endl;
+      // Start modified by CL
+
+      cout << "Modified to work with Outlook2010 by CL <cleitet@gmail.com> 2012-10-16" <<endl;
+
+      // End modified by CL
+
       cout << endl;
       cout << "Usage: " << GetFilename(argv[0]) << " \"Address List\"" << endl;
       cout << endl;
@@ -111,6 +138,34 @@ STDMETHODIMP SetDefaultAddressList(IMAPISession &Session, const string &AddressL
       cerr << "Error getting MAPI Address book." << endl;
       goto Exit;
    }
+   // Start Modified by CL
+   TraceDefaultDir(*lpAddrBook);
+
+   // Fix IID_CAPONE_PROF See note here: (http://msdn.microsoft.com/en-us/library/office/cc839797)
+   // Turning off the PR_AB_CHOOSE_DIRECTORY_AUTOMATICALLY property
+   // Set default address list
+
+   cout << "Resetting choose automatically property" <<endl;
+
+   LPPROFSECT lpProfileSection;
+   hr = Session.OpenProfileSection((LPMAPIUID)&IID_CAPONE_PROF, NULL, MAPI_MODIFY  , &lpProfileSection);
+   if (FAILED(hr)) {
+	   cerr << "Error opening profile section" << endl;
+	   goto Exit;
+   }
+
+
+   SPropValue lpPropValue;
+   lpPropValue.ulPropTag = PR_AB_CHOOSE_DIRECTORY_AUTOMATICALLY;
+   lpPropValue.Value.l = 0;
+
+   hr = HrSetOneProp(lpProfileSection, &lpPropValue);
+   if (FAILED(hr)) {
+	   cerr << "Error setting property for automatic choosing to off with error" << hr << endl;
+	   goto Exit;
+   }
+
+   //End modified by CL
 
    // Display feedback
    TraceDefaultDir(*lpAddrBook);
@@ -123,7 +178,12 @@ STDMETHODIMP SetDefaultAddressList(IMAPISession &Session, const string &AddressL
       goto Exit;
    }
 
-   TraceDefaultDir(*lpAddrBook);
+
+   // Start modified by CL
+
+   //TraceDefaultDir(*lpAddrBook);
+
+   // End modified by CL
 
 Exit:
    if (pAllocLink) MAPIFreeBuffer(pAllocLink);

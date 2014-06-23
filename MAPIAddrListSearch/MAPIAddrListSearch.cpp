@@ -3,6 +3,8 @@
 //
 // Shawn Poulson <spoulson@explodingcoder.com>, 2008.10.24
 //
+// Modified to work with Outlook 2010 by CL <cleitet@gmail.com> 2012-10-15
+//
 
 #include "stdafx.h"
 #include <mapix.h>
@@ -13,7 +15,34 @@
 #include <iostream>
 #include <list>
 #include <algorithm>
+//Start modified by CL
+
+#include <INITGUID.H>
+
+//End modified by CL
+
 using namespace std;
+
+//Start modified by CL
+
+// http://blogs.msdn.com/b/stephen_griffin/archive/2010/09/13/you-chose-wisely.aspx
+// Capone profile section
+// {00020D0A-0000-0000-C000-000000000046}
+DEFINE_OLEGUID(IID_CAPONE_PROF, 0x00020d0a, 0, 0);
+
+// See http://blogs.msdn.com/b/stephen_griffin/archive/2011/04/13/setsearchpath-not-really.aspx
+#define PR_AB_CHOOSE_DIRECTORY_AUTOMATICALLY PROP_TAG( PT_BOOLEAN, 0x3D1C)
+
+#define PR_AB_SEARCH_PATH_CUSTOMIZATION PROP_TAG( PT_LONG, 0x3D1B)
+
+typedef enum _SearchPathReorderType
+{
+                SEARCHPATHREORDERTYPE_RAW = 0,
+                SEARCHPATHREORDERTYPE_ACCT_PREFERGAL,
+                SEARCHPATHREORDERTYPE_ACCT_PREFERCONTACTS,
+} SearchPathReorderType;
+
+//End modified by CL
 
 STDMETHODIMP MAPILogon(LPMAPISESSION *lppSession);
 void MAPILogoff(IMAPISession &Session);
@@ -21,6 +50,12 @@ STDMETHODIMP SetAddressListSearchOrder(IMAPISession &Session, const list<string>
 SRowSet *AllocSRowSet(const list<SRow> &SRowList, const LPVOID pParent);
 STDMETHODIMP CopySBinary(SBinary &sbDest, const SBinary &sbSrc, const LPVOID pParent);
 string GetFilename(const char *Pathname);
+//Start modified by CL
+
+int Setcustomization(IMAPISession &lpSession);
+
+//End modified by CL
+
 
 int main(int argc, char *argv[]) {
    HRESULT hr;
@@ -28,6 +63,12 @@ int main(int argc, char *argv[]) {
    if (argc == 1) {
       cout << "Set MAPI address list search order" << endl;
       cout << "Shawn Poulson <spoulson@explodingcoder.com>, 2008.10.24" << endl;
+      //Start modified by CL
+
+      cout << "Modified to work with Outlook2010 by CL <cleitet@gmail.com> 2012-10-16" <<endl;
+
+      //End modified by CL
+
       cout << endl;
       cout << "Usage: " << GetFilename(argv[0]) << " \"Address List A\" [ \"Address List B\" ...]" << endl;
       cout << endl;
@@ -63,6 +104,12 @@ int main(int argc, char *argv[]) {
       // Save SearchList
       SetAddressListSearchOrder(*lpSession, SearchList);
 
+	  //Start modified by CL
+
+	  Setcustomization(*lpSession);
+
+	  //End modified by CL
+
       // Clean up
       MAPILogoff(*lpSession);
       hr = lpSession->Release();
@@ -96,6 +143,44 @@ void MAPILogoff(IMAPISession &Session) {
       cerr << "Warning: MAPI log off failed" << endl;
    }
 }
+
+  //Start modified by CL
+
+  // Set address list search order to Custom
+  int Setcustomization(IMAPISession &lpSession) {
+  HRESULT hr;
+  LPPROFSECT lpProfileSection = NULL;
+  LPSPropValue lpPropValue = NULL;
+  LONG FAR * ulPropCnt = NULL;
+  LPSPropValue FAR * pProps = NULL;
+
+  hr = lpSession.OpenProfileSection((LPMAPIUID)&IID_CAPONE_PROF, NULL, MAPI_MODIFY  , &lpProfileSection);
+  if (FAILED (hr)) {
+	  cerr << "Error: Could not open the CAPONE profile section" <<endl;
+	  return 1;
+  }
+
+  //hr = HrGetOneProp(lpProfileSection, PR_AB_CHOOSE_DIRECTORY_AUTOMATICALLY, &lpPropValue);// good for select automatically
+  hr = HrGetOneProp(lpProfileSection, PR_AB_SEARCH_PATH_CUSTOMIZATION, &lpPropValue);
+  if (FAILED (hr)) {
+	  lpProfileSection->Release();
+	  cerr << "Error: Could not open the property of the address book to set address list search order to Custom" <<endl;
+	  return 2;
+  }
+
+  //cout << "Server DN: %d\n", lpPropValue->Value.b;
+  lpPropValue->Value.l = SEARCHPATHREORDERTYPE_RAW;
+  hr = HrSetOneProp(lpProfileSection, lpPropValue);
+  if (FAILED (hr)) {
+	  MAPIFreeBuffer(lpPropValue);
+	  cerr << "Error: Could not set the property of the address list search order to Custom" <<endl;
+	  return 3; // can't get the prop
+  }
+
+  cout << "Configured address list search order to be Custom" <<endl;
+  return S_OK;
+}
+//End modified by CL
 
 // Set address list search order
 STDMETHODIMP SetAddressListSearchOrder(IMAPISession &Session, const list<string> &SearchList) {
