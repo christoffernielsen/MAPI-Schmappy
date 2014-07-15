@@ -1,13 +1,12 @@
 MAPI-Schmappy
 =============
 
-Release 2008-10-21  
-Github repo: https://github.com/spoulson/MAPI-Schmappy  
-Shawn Poulson, http://explodingcoder.com
+Release 2014-07-23  
+Github repo: https://github.com/christoffernielsen/MAPI-Schmappy  
 
 MAPI command line tools to set Outlook address list search path and default address list.
 
-As explained in my blog post: http://explodingcoder.com/blog/content/programmatically-updating-outlooks-address-book-options-with-a-command-line-toolAll
+As explained in @spoulson blog post: http://explodingcoder.com/blog/content/programmatically-updating-outlooks-address-book-options-with-a-command-line-toolAll
 
 INTRODUCTION
 ------------
@@ -22,7 +21,7 @@ SYSTEM REQUIREMENTS
 MAPI Schmappy tools were tested under the following environment:
 
 ### Server
- - Exchange Server 2003
+ - Exchange Server 2010
 
 ### Client
  - Outlook 2010
