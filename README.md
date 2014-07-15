@@ -36,7 +36,7 @@ BUILD
 
 BINARIES
 --------
-Binaries of the June 23rd release are located here: http://christoffernielsen.github.io/
+Binaries of the June 23rd 2014 release are located here: http://christoffernielsen.github.io/
 
 KNOWN ISSUES
 ------------
