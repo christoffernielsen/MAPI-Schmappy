@@ -6,7 +6,7 @@ Github repo: https://github.com/christoffernielsen/MAPI-Schmappy
 
 MAPI command line tools to set Outlook address list search path and default address list.
 
-As explained in @spoulson blog post: http://explodingcoder.com/blog/content/programmatically-updating-outlooks-address-book-options-with-a-command-line-toolAll
+As explained in this blog post: http://explodingcoder.com/blog/content/programmatically-updating-outlooks-address-book-options-with-a-command-line-toolAll
 
 INTRODUCTION
 ------------
