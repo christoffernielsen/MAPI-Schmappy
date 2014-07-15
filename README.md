@@ -34,6 +34,10 @@ BUILD
  - Build as appropriate the platform and configuration.
  - Executables will be found in Debug/Release configuration directories for Win32.  There will be additional x64 subdirectory containing x64 executables.
 
+BINARIES
+--------
+Binaries of this release are located here: http://christoffernielsen.github.io/
+
 KNOWN ISSUES
 ------------
 - These tools are known to not work properly under some environments running newer versions of Exchange and/or Outlook.
