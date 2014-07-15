@@ -25,12 +25,13 @@ MAPI Schmappy tools were tested under the following environment:
  - Exchange Server 2003
 
 ### Client
- - Outlook 2000
- - Windows XP SP3
+ - Outlook 2010
+ - Windows 7 64-bit
 
 BUILD
 -----
- - Using Visual Studio 2010, 2008, or 2005, open the corresponding solution file in the repository root. (e.g. MAPI Schmappy-vs2010.sln)
+ - Using Visual Studio 2013, 2010, 2008, or 2005, open the corresponding solution file in the repository root. (e.g. MAPI Schmappy-vs2013.sln)
+ - Put required Outlook 2010 MAPI Headers http://www.microsoft.com/en-us/download/details.aspx?id=12905 into a include path
  - Build as appropriate the platform and configuration.
  - Executables will be found in Debug/Release configuration directories for Win32.  There will be additional x64 subdirectory containing x64 executables.
 
